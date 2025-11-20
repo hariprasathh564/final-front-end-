@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* simple adjustments */
+html, body, #root {
+  height: 100%;
+    padding-top: 1.5rem; /* adjust to navbar height */
+
+}
+.container {
+  max-width: 1200px;
+}
