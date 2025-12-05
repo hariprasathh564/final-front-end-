@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/axiosClient";
+import AdminLayout from "./AdminLayout";
 
 export default function Payments() {
   const [payments, setPayments] = useState([]);
@@ -17,17 +18,19 @@ export default function Payments() {
   }, []);
 
   return (
+    <AdminLayout>
     <div>
       <h2 className="text-2xl font-bold mb-4">Payments</h2>
       <div className="space-y-3">
         {payments.map(p => (
           <div key={p._id} className="border p-3 rounded">
-            <div>Amount: ₹ {p.amount}</div>
+            <div>Amount: Rs {p.amount}</div>
             <div>Status: {p.status}</div>
             <div>Provider id: {p.payment_provider_id}</div>
           </div>
         ))}
       </div>
     </div>
+    </AdminLayout>
   );
 }

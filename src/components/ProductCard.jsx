@@ -10,7 +10,7 @@ export default function ProductCard({ product }) {
         <h3 className="font-semibold text-lg">{product.name}</h3>
         <p className="text-sm text-gray-600 mt-1">{product.description?.slice(0, 100)}</p>
         <div className="mt-3 flex justify-between items-center">
-          <div className="text-lg font-bold">₹ {product.price}</div>
+          <div className="text-lg font-bold">Rs {product.price}</div>
           <Link to={`/product/${product._id}`} className="text-sm bg-sky-600 text-white px-3 py-1 rounded">View</Link>
         </div>
       </div>

@@ -1,556 +1,467 @@
-// // src/pages/ProductDetail.jsx
-// import React, { useEffect, useState } from "react";
-// import { useParams, useNavigate } from "react-router-dom";
-// import API from "../api/axiosClient";
-// import { useDispatch } from "react-redux";
-// import { addItem } from "../store/cartSlice";
-// import { motion, AnimatePresence } from "framer-motion";
-
-// export default function ProductDetail() {
-//   const { id } = useParams();
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//   const [product, setProduct] = useState(null);
-//   const [qty, setQty] = useState(1);
-//   const [selectedFlavor, setSelectedFlavor] = useState(null);
-//   const [cartBubbles, setCartBubbles] = useState([]);
-//   const [showToast, setShowToast] = useState(false); // Toast state
-
-//   useEffect(() => {
-//     API.get(`/products/${id}`)
-//       .then((res) => {
-//         setProduct(res.data);
-//         setSelectedFlavor(res.data.flavors?.[0] || null);
-//       })
-//       .catch((err) => console.error(err));
-//   }, [id]);
-
-//   const handleAdd = () => {
-//     if (!product) return;
-
-//     // Check if user is logged in
-//     const token = localStorage.getItem("token"); // Replace with your auth logic
-//     if (!token) {
-//       alert("Please login to add products to your cart.");
-//       navigate("/login");
-//       return;
-//     }
-
-//     // Add item to cart backend
-//     API.post("/cart/add", { productId: product._id, quantity: qty }).catch(console.error);
-
-//     // Add to redux cart
-//     dispatch(
-//       addItem({
-//         _id: product._id,
-//         name: product.name,
-//         price: product.price,
-//         image: selectedFlavor?.image || product.images?.[0],
-//         quantity: qty,
-//         flavor: selectedFlavor?.name,
-//       })
-//     );
-
-//     // Trigger bubble animation
-//     const newBubble = { id: Date.now() };
-//     setCartBubbles((prev) => [...prev, newBubble]);
-//     setTimeout(() => setCartBubbles((prev) => prev.filter((b) => b.id !== newBubble.id)), 1000);
-
-//     // Show toast
-//     setShowToast(true);
-//     setTimeout(() => setShowToast(false), 2000); // hide after 2s
-
-//     // Navigate to cart after 2 seconds
-//     setTimeout(() => {
-//       navigate("/cart");
-//     }, 2000);
-//   };
-
-//   if (!product) return <div className="text-center py-20">Loading product...</div>;
-
-//   const flavorColors = {
-//     grape: "from-purple-300 to-purple-100",
-//     mango: "from-yellow-200 to-orange-100",
-//     bubbleTea: "from-yellow-50 to-brown-50",
-//   };
-
-//   const bgGradient =
-//     selectedFlavor ? flavorColors[selectedFlavor.name] || "from-purple-50 to-white" : "from-purple-50 to-white";
-
-//   return (
-//     <div className={`relative min-h-screen py-10 px-4 bg-gradient-to-b ${bgGradient} overflow-hidden`}>
-//       {/* Floating bubbles */}
-//       {Array.from({ length: 20 }).map((_, i) => (
-//         <span
-//           key={i}
-//           className="absolute rounded-full bg-white bg-opacity-40 animate-floating-bubble"
-//           style={{
-//             width: `${Math.random() * 25 + 10}px`,
-//             height: `${Math.random() * 25 + 10}px`,
-//             left: `${Math.random() * 100}%`,
-//             bottom: `${Math.random() * 5}px`,
-//             animationDuration: `${Math.random() * 10 + 5}s`,
-//             animationDelay: `${Math.random() * 5}s`,
-//           }}
-//         />
-//       ))}
-
-//       {/* Cart Bubbles */}
-//       <AnimatePresence>
-//         {cartBubbles.map((b) => (
-//           <motion.span
-//             key={b.id}
-//             className="absolute w-4 h-4 bg-white rounded-full"
-//             initial={{ bottom: 50, opacity: 1, x: 0 }}
-//             animate={{ bottom: 300, opacity: 0, x: 100 }}
-//             exit={{ opacity: 0 }}
-//             transition={{ duration: 1 }}
-//           />
-//         ))}
-//       </AnimatePresence>
-
-//       {/* Toast Notification */}
-//       <AnimatePresence>
-//         {showToast && (
-//           <motion.div
-//             className="fixed top-10 right-10 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
-//             initial={{ opacity: 0, y: -20 }}
-//             animate={{ opacity: 1, y: 0 }}
-//             exit={{ opacity: 0, y: -20 }}
-//             transition={{ duration: 0.3 }}
-//           >
-//             Added to cart!
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-
-//       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 relative z-10">
-//         {/* Product Image */}
-//         <motion.div
-//           className="relative rounded-xl shadow-2xl overflow-hidden"
-//           initial={{ opacity: 0, x: -50 }}
-//           animate={{ opacity: 1, x: 0 }}
-//           transition={{ duration: 0.5 }}
-//         >
-//           <img
-//             src={selectedFlavor?.image || product.images?.[0] || "https://via.placeholder.com/600"}
-//             alt={product.name}
-//             className="w-full h-full object-cover rounded-xl hover:scale-105 transform transition"
-//           />
-//           {/* Flavor Badge */}
-//           {selectedFlavor && (
-//             <div className="absolute top-4 left-4 bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md animate-pulse">
-//               {selectedFlavor.name}
-//             </div>
-//           )}
-//         </motion.div>
-
-//         {/* Product Info */}
-//         <motion.div
-//           className="flex flex-col justify-between"
-//           initial={{ opacity: 0, x: 50 }}
-//           animate={{ opacity: 1, x: 0 }}
-//           transition={{ duration: 0.5, delay: 0.2 }}
-//         >
-//           <h1 className="text-3xl font-bold text-purple-700 mb-2">{product.name}</h1>
-//           <p className="text-gray-600 mb-4">{product.description}</p>
-
-//           {/* Flavor Selector */}
-//           {product.flavors && product.flavors.length > 0 && (
-//             <div className="flex gap-2 mb-4">
-//               {product.flavors.map((flavor) => (
-//                 <button
-//                   key={flavor.name}
-//                   onClick={() => setSelectedFlavor(flavor)}
-//                   className={`px-3 py-1 rounded-full font-semibold ${
-//                     selectedFlavor?.name === flavor.name ? "bg-purple-500 text-white" : "bg-white text-gray-700 shadow"
-//                   } transition`}
-//                 >
-//                   {flavor.name}
-//                 </button>
-//               ))}
-//             </div>
-//           )}
-
-//           {/* Price */}
-//           <motion.div
-//             key={qty}
-//             className="text-3xl font-extrabold text-purple-600 mb-6"
-//             initial={{ scale: 0.9 }}
-//             animate={{ scale: 1 }}
-//             transition={{ duration: 0.3 }}
-//           >
-//             ₹ {product.price * qty}
-//           </motion.div>
-
-//           {/* Quantity Selector */}
-//           <div className="flex items-center gap-4 mb-6">
-//             <button
-//               onClick={() => setQty((prev) => Math.max(1, prev - 1))}
-//               className="px-3 py-1 bg-gray-200 rounded-lg font-bold hover:bg-gray-300 transition"
-//             >
-//               -
-//             </button>
-//             <span className="px-3 py-1 border rounded-lg">{qty}</span>
-//             <button
-//               onClick={() => setQty((prev) => prev + 1)}
-//               className="px-3 py-1 bg-gray-200 rounded-lg font-bold hover:bg-gray-300 transition"
-//             >
-//               +
-//             </button>
-
-//             <motion.button
-//               whileHover={{ scale: 1.05, boxShadow: "0px 0px 20px rgba(99, 102, 241, 0.5)" }}
-//               whileTap={{ scale: 0.95 }}
-//               onClick={handleAdd}
-//               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all"
-//             >
-//               Add to Cart
-//             </motion.button>
-//           </div>
-
-//           {/* Reviews */}
-//           <div className="bg-purple-50 p-4 rounded-lg shadow-inner border-l-4 border-pink-400">
-//             <div className="flex items-center gap-2 mb-2">
-//               {[...Array(5)].map((_, i) => (
-//                 <span key={i} className={`${i < product.rating ? "text-yellow-400" : "text-gray-300"}`}>
-//                   ★
-//                 </span>
-//               ))}
-//               <span className="text-gray-600 ml-2">({product.reviews?.length || 0} reviews)</span>
-//             </div>
-//             <p className="text-purple-700 font-semibold">
-//               Enjoy a fizzy and refreshing experience with our Milk Soda!
-//             </p>
-//           </div>
-//         </motion.div>
-//       </div>
-
-//       {/* Floating bubble animation */}
-//       <style>
-//         {`
-//           @keyframes floating-bubble {
-//             0% { transform: translateY(0) scale(1); opacity: 0.7; }
-//             50% { opacity: 1; }
-//             100% { transform: translateY(-400px) scale(1.3); opacity: 0; }
-//           }
-
-//           .animate-floating-bubble {
-//             animation-name: floating-bubble;
-//             animation-iteration-count: infinite;
-//             animation-timing-function: linear;
-//           }
-//         `}
-//       </style>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // src/pages/ProductDetail.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../api/axiosClient";
+import API from "../api/axiosClient"; 
 import { useDispatch } from "react-redux";
-import { addItem } from "../store/cartSlice";
-import { motion, AnimatePresence } from "framer-motion";
+import { addItem } from "../store/cartSlice"; 
+import { 
+  motion, 
+  AnimatePresence, 
+  useSpring, 
+  useMotionValue 
+} from "framer-motion";
+import { 
+  FaShoppingCart, FaStar, FaArrowLeft, FaBolt, FaLeaf, 
+  FaBoxOpen, FaCheckCircle, FaPlus, FaMinus, FaHeart, 
+  FaChevronDown, FaChevronUp, FaQuoteLeft, FaShieldAlt, FaTruck
+} from "react-icons/fa";
 
+/* =========================================
+   1. COMPONENT: MAGNETIC BUTTON
+   ========================================= */
+const MagneticButton = ({ children, onClick, className }) => {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const handleMouseMove = (e) => {
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    x.set((clientX - (left + width / 2)) * 0.3);
+    y.set((clientY - (top + height / 2)) * 0.3);
+  };
+
+  return (
+    <motion.button
+      ref={ref}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+      style={{ x: mouseX, y: mouseY }}
+      whileTap={{ scale: 0.95 }}
+      className={className}
+    >
+      {children}
+    </motion.button>
+  );
+};
+
+/* =========================================
+   2. COMPONENT: ACCORDION ITEM
+   ========================================= */
+const AccordionItem = ({ title, isOpen, onClick, children }) => {
+  return (
+    <div className="border-b border-slate-100 last:border-0">
+      <button 
+        onClick={onClick} 
+        className="w-full py-5 flex items-center justify-between text-left focus:outline-none group"
+      >
+        <span className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{title}</span>
+        {isOpen ? <FaChevronUp className="text-indigo-600" /> : <FaChevronDown className="text-slate-300 group-hover:text-indigo-600" />}
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pb-5 text-slate-600 leading-relaxed text-sm">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+/* =========================================
+   3. COMPONENT: MARQUEE
+   ========================================= */
+const Marquee = () => (
+  <div className="w-full bg-indigo-600 overflow-hidden py-3 relative z-20 flex-shrink-0">
+    <motion.div
+      className="flex whitespace-nowrap text-white font-bold text-sm uppercase tracking-widest"
+      animate={{ x: [0, -1000] }}
+      transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
+    >
+      {[...Array(10)].map((_, i) => (
+        <div key={i} className="flex items-center mx-8">
+          <span>Fresh Farm Milk</span>
+          <span className="mx-4 text-pink-300">✦</span>
+          <span>Real Fruit Soda</span>
+          <span className="mx-4 text-pink-300">✦</span>
+        </div>
+      ))}
+    </motion.div>
+  </div>
+);
+
+/* =========================================
+   MAIN PAGE COMPONENT
+   ========================================= */
 export default function ProductDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // --- STATE ---
   const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
   const [selectedFlavor, setSelectedFlavor] = useState(null);
-  const [cartBubbles, setCartBubbles] = useState([]);
-  const [showToast, setShowToast] = useState(false); 
+  const [showToast, setShowToast] = useState(false);
   const [flyingImage, setFlyingImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [openAccordion, setOpenAccordion] = useState("nutrition");
+  
+  // --- REFS ---
+  const imgRef = useRef(null);
+  const cartRef = useRef(null);
 
-  const imgRef = useRef(null); // ref to product image
-  const cartRef = useRef(null); // ref to cart icon
-
+  // --- FETCH DATA ---
   useEffect(() => {
-    API.get(`/products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-        setSelectedFlavor(res.data.flavors?.[0] || null);
-      })
-      .catch((err) => console.error(err));
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await API.get(`/products/${id}`);
+        if (res.data) {
+          setProduct(res.data);
+          setSelectedFlavor(res.data.flavors?.[0] || null);
+        } else {
+          throw new Error("No data");
+        }
+      } catch (err) {
+        console.warn("Using Mock Data");
+        const mockProduct = {
+          _id: id || "123",
+          name: "Creamy Strawberry Fizz",
+          price: 250,
+          description: "A dreamy blend of fresh farm milk and sparkling strawberry soda. Sweet, creamy, and unexpectedly refreshing. Crafted with organic ingredients sourced directly from local dairy farms.",
+          category: "Milk Soda",
+          rating: 4.8,
+          reviews: 128,
+          images: ["https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80"],
+          flavors: [
+             { name: "Sweet Strawberry", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80" },
+             { name: "Classic Vanilla", image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80" }
+          ]
+        };
+        setProduct(mockProduct);
+        setSelectedFlavor(mockProduct.flavors[0]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [id]);
 
-  // Find cart icon in Navbar after mount
   useEffect(() => {
-    const cartEl = document.querySelector("#navbar-cart-icon");
+    const cartEl = document.getElementById("navbar-cart-icon") || document.querySelector(".fa-shopping-cart");
     if (cartEl) cartRef.current = cartEl;
-  }, []);
+  }, [loading]);
 
   const handleAdd = () => {
     if (!product) return;
+    dispatch(addItem({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: selectedFlavor?.image || product.images?.[0],
+      quantity: qty,
+      flavor: selectedFlavor?.name,
+    }));
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please login to add products to your cart.");
-      navigate("/login");
-      return;
-    }
-
-    // Add item to backend
-    API.post("/cart/add", { productId: product._id, quantity: qty }).catch(console.error);
-
-    // Add to redux cart
-    dispatch(
-      addItem({
-        _id: product._id,
-        name: product.name,
-        price: product.price,
-        image: selectedFlavor?.image || product.images?.[0],
-        quantity: qty,
-        flavor: selectedFlavor?.name,
-      })
-    );
-
-    // Trigger bubble animation
-    const newBubble = { id: Date.now() };
-    setCartBubbles((prev) => [...prev, newBubble]);
-    setTimeout(() => setCartBubbles((prev) => prev.filter((b) => b.id !== newBubble.id)), 1000);
-
-    // Show toast
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
-
-    // Trigger flying image animation
-    if (imgRef.current && cartRef.current) {
+    if (imgRef.current) {
       const imgRect = imgRef.current.getBoundingClientRect();
-      const cartRect = cartRef.current.getBoundingClientRect();
+      const cartRect = cartRef.current 
+        ? cartRef.current.getBoundingClientRect() 
+        : { left: window.innerWidth - 50, top: 20, width: 20, height: 20 };
 
       setFlyingImage({
         src: selectedFlavor?.image || product.images?.[0],
         start: { x: imgRect.left, y: imgRect.top, width: imgRect.width, height: imgRect.height },
-        end: { x: cartRect.left + cartRect.width / 2 - imgRect.width / 4, y: cartRect.top + cartRect.height / 2 - imgRect.height / 4, width: imgRect.width / 2, height: imgRect.height / 2 },
+        end: { x: cartRect.left, y: cartRect.top, width: 40, height: 40 },
         id: Date.now(),
       });
     }
-
-    // Navigate to cart after animation
-    setTimeout(() => navigate("/cart"), 1200);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2500);
   };
 
-  if (!product) return <div className="text-center py-20">Loading product...</div>;
-
-  const flavorColors = {
-    grape: "from-purple-300 to-purple-100",
-    mango: "from-yellow-200 to-orange-100",
-    bubbleTea: "from-yellow-50 to-brown-50",
-  };
-
-  const bgGradient =
-    selectedFlavor ? flavorColors[selectedFlavor.name] || "from-purple-50 to-white" : "from-purple-50 to-white";
+  if (loading || !product) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] text-indigo-600 font-bold text-xl animate-pulse">
+      Mixing Ingredients...
+    </div>
+  );
 
   return (
-    <div className={`relative min-h-screen py-10 px-4 bg-gradient-to-b ${bgGradient} overflow-hidden`}>
-      {/* Flying Image */}
+    // H-SCREEN AND OVERFLOW HIDDEN PREVENTS WINDOW SCROLL
+    <div className="h-screen w-full bg-[#F8FAFC] text-slate-900 font-sans overflow-hidden selection:bg-pink-300 selection:text-pink-900 flex flex-col lg:flex-row">
+      
+      {/* FLYING ANIMATION LAYER */}
       {flyingImage && (
         <motion.img
-          key={flyingImage.id}
-          src={flyingImage.src}
-          className="fixed z-50 rounded-lg pointer-events-none shadow-lg"
-          initial={{
-            x: flyingImage.start.x,
-            y: flyingImage.start.y,
-            width: flyingImage.start.width,
-            height: flyingImage.start.height,
-            rotate: 0,
-          }}
-          animate={{
-            x: flyingImage.end.x,
-            y: flyingImage.end.y,
-            width: flyingImage.end.width,
-            height: flyingImage.end.height,
-            rotate: 720,
-            scale: 0.5,
-          }}
-          transition={{ duration: 1, ease: [0.65, 0, 0.35, 1] }}
+          key={flyingImage.id} src={flyingImage.src}
+          className="fixed z-[9999] rounded-full border-4 border-white shadow-2xl pointer-events-none object-cover"
+          initial={{ x: flyingImage.start.x, y: flyingImage.start.y, width: flyingImage.start.width, height: flyingImage.start.height, opacity: 1 }}
+          animate={{ x: flyingImage.end.x, y: flyingImage.end.y, width: 40, height: 40, opacity: 0.5, scale: 0.5 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           onAnimationComplete={() => setFlyingImage(null)}
         />
       )}
 
-      {/* Floating bubbles */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <span
-          key={i}
-          className="absolute rounded-full bg-white bg-opacity-40 animate-floating-bubble"
-          style={{
-            width: `${Math.random() * 25 + 10}px`,
-            height: `${Math.random() * 25 + 10}px`,
-            left: `${Math.random() * 100}%`,
-            bottom: `${Math.random() * 5}px`,
-            animationDuration: `${Math.random() * 10 + 5}s`,
-            animationDelay: `${Math.random() * 5}s`,
-          }}
-        />
-      ))}
-
-      {/* Cart Bubbles */}
-      <AnimatePresence>
-        {cartBubbles.map((b) => (
-          <motion.span
-            key={b.id}
-            className="absolute w-4 h-4 bg-white rounded-full"
-            initial={{ bottom: 50, opacity: 1, x: 0 }}
-            animate={{ bottom: 300, opacity: 0, x: 100 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-          />
-        ))}
-      </AnimatePresence>
-
-      {/* Toast */}
+      {/* SUCCESS TOAST */}
       <AnimatePresence>
         {showToast && (
-          <motion.div
-            className="fixed top-10 right-10 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            Added to cart!
-          </motion.div>
+           <motion.div 
+             initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
+             className="fixed top-4 right-4 md:right-10 z-[100]"
+           >
+             <div className="bg-white/90 backdrop-blur-md text-slate-900 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-indigo-100">
+                <div className="bg-green-100 text-green-600 p-2 rounded-full"><FaCheckCircle /></div>
+                <div>
+                    <p className="font-bold text-sm">Added to Bag!</p>
+                    <p className="text-xs text-slate-500">Excellent choice.</p>
+                </div>
+             </div>
+           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 relative z-10">
-        {/* Product Image */}
-        <motion.div
-          ref={imgRef}
-          className="relative rounded-xl shadow-2xl overflow-hidden product-image-container"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <img
-            src={selectedFlavor?.image || product.images?.[0] || "https://via.placeholder.com/600"}
-            alt={product.name}
-            className="w-full h-full object-cover rounded-xl hover:scale-105 transform transition"
-          />
-          {selectedFlavor && (
-            <div className="absolute top-4 left-4 bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md animate-pulse">
-              {selectedFlavor.name}
-            </div>
-          )}
-        </motion.div>
-
-        {/* Product Info */}
-        <motion.div
-          className="flex flex-col justify-between"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <h1 className="text-3xl font-bold text-purple-700 mb-2">{product.name}</h1>
-          <p className="text-gray-600 mb-4">{product.description}</p>
-
-          {product.flavors && product.flavors.length > 0 && (
-            <div className="flex gap-2 mb-4">
-              {product.flavors.map((flavor) => (
-                <button
-                  key={flavor.name}
-                  onClick={() => setSelectedFlavor(flavor)}
-                  className={`px-3 py-1 rounded-full font-semibold ${
-                    selectedFlavor?.name === flavor.name
-                      ? "bg-purple-500 text-white"
-                      : "bg-white text-gray-700 shadow"
-                  } transition`}
-                >
-                  {flavor.name}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <motion.div
-            key={qty}
-            className="text-3xl font-extrabold text-purple-600 mb-6"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            ₹ {product.price * qty}
-          </motion.div>
-
-          <div className="flex items-center gap-4 mb-6">
-            <button
-              onClick={() => setQty((prev) => Math.max(1, prev - 1))}
-              className="px-3 py-1 bg-gray-200 rounded-lg font-bold hover:bg-gray-300 transition"
-            >
-              -
-            </button>
-            <span className="px-3 py-1 border rounded-lg">{qty}</span>
-            <button
-              onClick={() => setQty((prev) => prev + 1)}
-              className="px-3 py-1 bg-gray-200 rounded-lg font-bold hover:bg-gray-300 transition"
-            >
-              +
+      {/* === LEFT PANEL: FIXED SHOWCASE === */}
+      {/* This side takes up 50% width and 100% height. It has no scrollbar. */}
+      <div className="lg:w-1/2 h-[40vh] lg:h-full relative bg-[#F1F5F9] overflow-hidden flex items-center justify-center">
+            
+            {/* 1. Back Button */}
+            <button onClick={() => navigate(-1)} className="absolute top-8 left-8 z-20 group flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition font-bold text-sm bg-white/60 backdrop-blur px-4 py-2 rounded-full shadow-sm">
+                <FaArrowLeft /> Back
             </button>
 
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0px 0px 20px rgba(99, 102, 241, 0.5)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleAdd}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all"
+            {/* 2. Animated Background Elements */}
+            <motion.div 
+               animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+               className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-pink-200/40 to-indigo-200/40 rounded-[40%] blur-3xl"
+            />
+            
+            {/* Floating Ingredients (Decor) */}
+            <motion.div 
+               animate={{ y: [-20, 20, -20], rotate: [0, 10, 0] }} 
+               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+               className="absolute top-[20%] left-[15%] text-5xl z-0 opacity-60 drop-shadow-sm"
             >
-              Add to Cart
-            </motion.button>
-          </div>
+               🍓
+            </motion.div>
+            <motion.div 
+               animate={{ y: [15, -15, 15], rotate: [0, -15, 0] }} 
+               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+               className="absolute bottom-[20%] right-[15%] text-4xl z-0 opacity-60 drop-shadow-sm"
+            >
+               🫧
+            </motion.div>
 
-          <div className="bg-purple-50 p-4 rounded-lg shadow-inner border-l-4 border-pink-400">
-            <div className="flex items-center gap-2 mb-2">
-              {[...Array(5)].map((_, i) => (
-                <span key={i} className={`${i < product.rating ? "text-yellow-400" : "text-gray-300"}`}>
-                  ★
-                </span>
-              ))}
-              <span className="text-gray-600 ml-2">({product.reviews?.length || 0} reviews)</span>
+            {/* 3. Levitating Product Image */}
+            <div className="relative z-10 w-[65%] aspect-square flex items-center justify-center">
+                {/* The Image itself floats up and down */}
+                <motion.img 
+                   ref={imgRef}
+                   key={selectedFlavor ? selectedFlavor.name : "main"}
+                   initial={{ scale: 0.8, opacity: 0, y: 50 }}
+                   animate={{ 
+                       scale: 1, 
+                       opacity: 1, 
+                       y: [0, -20, 0] // Levitation Effect
+                   }}
+                   transition={{ 
+                       scale: { duration: 0.8, type: "spring" },
+                       y: { duration: 4, repeat: Infinity, ease: "easeInOut" } 
+                   }}
+                   src={selectedFlavor?.image || product.images?.[0]} 
+                   alt={product.name}
+                   className="w-full h-full object-contain drop-shadow-2xl z-10"
+                />
+                
+                {/* Dynamic Shadow underneath */}
+                <motion.div 
+                   animate={{ scale: [1, 0.8, 1], opacity: [0.2, 0.1, 0.2] }}
+                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                   className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-1/2 h-6 bg-black rounded-[100%] blur-xl"
+                />
             </div>
-            <p className="text-purple-700 font-semibold">
-              Enjoy a fizzy and refreshing experience with our Milk Soda!
-            </p>
-          </div>
-        </motion.div>
       </div>
 
-      <style>
-        {`
-          @keyframes floating-bubble {
-            0% { transform: translateY(0) scale(1); opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-400px) scale(1.3); opacity: 0; }
-          }
-          .animate-floating-bubble {
-            animation-name: floating-bubble;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
-          }
-        `}
-      </style>
+      {/* === RIGHT PANEL: SCROLLABLE CONTENT === */}
+      {/* This side has overflow-y-auto, allowing scrolling independently */}
+      <div className="lg:w-1/2 h-auto lg:h-full bg-white/80 backdrop-blur-md relative flex flex-col overflow-y-auto no-scrollbar">
+         
+         {/* Sticky Marquee at top of scrolling area */}
+         <div className="sticky top-0 z-30">
+             <Marquee />
+         </div>
+            
+         <div className="p-8 md:p-12 lg:p-16 flex flex-col gap-10">
+                
+            {/* Header */}
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                <div className="flex items-center justify-between mb-6">
+                    <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black uppercase tracking-wider border border-indigo-100">
+                        {product.category}
+                    </span>
+                    <button className="w-10 h-10 rounded-full bg-slate-50 hover:bg-pink-50 hover:text-pink-500 flex items-center justify-center transition text-slate-400"><FaHeart/></button>
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-[0.95] tracking-tight mb-6">
+                    {product.name}
+                </h1>
+
+                <div className="flex items-center gap-4 text-sm font-bold text-slate-500">
+                    <div className="flex text-yellow-400 gap-1"><FaStar/><FaStar/><FaStar/><FaStar/><FaStar/></div>
+                    <span>{product.rating} Rating</span>
+                    <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                    <span>{product.reviews} Reviews</span>
+                </div>
+            </motion.div>
+
+            {/* Price & Action Card */}
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <p className="text-xs font-bold uppercase text-slate-400 mb-1">Total Price</p>
+                            <div className="text-4xl font-black text-slate-900 flex items-baseline">
+                                <span className="text-2xl mr-1">₹</span>{product.price * qty}
+                            </div>
+                        </div>
+                        <div className="flex items-center bg-white rounded-full p-2 shadow-sm border border-slate-100">
+                            <button onClick={() => setQty(Math.max(1, qty-1))} className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><FaMinus size={10}/></button>
+                            <span className="w-12 text-center font-black text-lg">{qty}</span>
+                            <button onClick={() => setQty(qty+1)} className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><FaPlus size={10}/></button>
+                        </div>
+                </div>
+
+                <MagneticButton 
+                    onClick={handleAdd}
+                    className="w-full h-16 bg-slate-900 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-200 hover:bg-indigo-600 transition-colors flex items-center justify-center gap-3 overflow-hidden relative group"
+                >
+                    <span className="relative z-10 flex items-center gap-2">Add To Cart <FaShoppingCart/></span>
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                </MagneticButton>
+            </motion.div>
+
+            {/* Description */}
+            <div className="space-y-4">
+                <h3 className="text-xl font-black">Description</h3>
+                <p className="text-slate-600 text-lg leading-relaxed">
+                    {product.description}
+                </p>
+            </div>
+
+            {/* Flavors (Pills) */}
+            {product.flavors && product.flavors.length > 0 && (
+                <div>
+                    <h3 className="text-xl font-black mb-4">Choose Flavor</h3>
+                    <div className="flex flex-wrap gap-3">
+                        {product.flavors.map(flavor => (
+                            <button 
+                                key={flavor.name}
+                                onClick={() => setSelectedFlavor(flavor)}
+                                className={`px-6 py-3 rounded-xl font-bold border-2 transition-all duration-300
+                                ${selectedFlavor?.name === flavor.name 
+                                    ? "border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm scale-105" 
+                                    : "border-slate-100 bg-white text-slate-500 hover:border-slate-300"}`}
+                            >
+                                {flavor.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Visual Ingredients */}
+            <div>
+                <h3 className="text-xl font-black mb-4">Pure Ingredients</h3>
+                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    {[
+                        { name: "Fresh Milk", emoji: "🥛", bg: "bg-blue-50 text-blue-500" },
+                        { name: "Real Fruit", emoji: "🍓", bg: "bg-pink-50 text-pink-500" },
+                        { name: "Cane Sugar", emoji: "🎋", bg: "bg-green-50 text-green-500" },
+                        { name: "Sparkle", emoji: "✨", bg: "bg-yellow-50 text-yellow-500" },
+                    ].map((ing, i) => (
+                        <div key={i} className={`flex-shrink-0 w-24 h-28 rounded-2xl border border-slate-50 flex flex-col items-center justify-center gap-2 ${ing.bg}`}>
+                            <div className="text-3xl">{ing.emoji}</div>
+                            <span className="text-xs font-bold text-center leading-tight px-2">{ing.name}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ACCORDION (FAQ & Info) */}
+            <div className="border-t border-slate-100 pt-4">
+                <AccordionItem 
+                    title="Nutritional Facts" 
+                    isOpen={openAccordion === "nutrition"} 
+                    onClick={() => setOpenAccordion(openAccordion === "nutrition" ? "" : "nutrition")}
+                >
+                    <div className="grid grid-cols-2 gap-y-2">
+                        <div className="flex justify-between border-b border-slate-50 pb-1"><span>Calories</span> <span className="font-bold">140</span></div>
+                        <div className="flex justify-between border-b border-slate-50 pb-1"><span>Sugar</span> <span className="font-bold">12g</span></div>
+                        <div className="flex justify-between border-b border-slate-50 pb-1"><span>Protein</span> <span className="font-bold">8g</span></div>
+                        <div className="flex justify-between border-b border-slate-50 pb-1"><span>Fat</span> <span className="font-bold">4g</span></div>
+                    </div>
+                </AccordionItem>
+
+                <AccordionItem 
+                    title="Shipping & Returns" 
+                    isOpen={openAccordion === "shipping"} 
+                    onClick={() => setOpenAccordion(openAccordion === "shipping" ? "" : "shipping")}
+                >
+                    <p>Free shipping on orders over ₹500. We accept returns within 30 days if the bottle is unopened.</p>
+                </AccordionItem>
+            </div>
+
+            {/* CUSTOMER LOVE */}
+            <div className="bg-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg shadow-indigo-200">
+                <FaQuoteLeft className="absolute top-4 left-4 text-white/20 text-4xl" />
+                <div className="relative z-10">
+                    <p className="text-lg font-medium italic mb-4">"Hands down the best drink I've had this year. The texture is creamy yet so refreshing. Highly recommend!"</p>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">JD</div>
+                        <div>
+                            <p className="font-bold text-sm">Jane Doe</p>
+                            <div className="flex text-yellow-400 text-xs"><FaStar/><FaStar/><FaStar/><FaStar/><FaStar/></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            </div>
+
+            {/* PAIRING */}
+            <div>
+                <h3 className="text-xl font-black mb-4">Pairs Well With</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    {[1, 2].map((_, i) => (
+                        <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                            <div className="w-12 h-12 bg-slate-100 rounded-lg group-hover:scale-110 transition"></div>
+                            <div>
+                                <p className="font-bold text-sm">Butter Cookies</p>
+                                <p className="text-xs text-indigo-500 font-bold">₹50</p>
+                            </div>
+                            <button className="ml-auto w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs shadow-lg"><FaPlus/></button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="h-20"></div>
+         </div>
+      </div>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }
-
-
-
-
-
-
