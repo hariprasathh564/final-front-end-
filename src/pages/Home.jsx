@@ -362,7 +362,7 @@ export default function Home() {
 
            {featuredProducts.length === 0 ? (
                <div className="text-center py-20">
-                  <p className="text-gray-500 text-xl">No products found in this category.</p>
+                  <p className="text-gray-500 text-xl">Only available in our shops.</p>
                   <button onClick={() => setCategoryFilter("All")} className="mt-4 text-purple-600 font-bold underline">Show All</button>
                </div>
            ) : (

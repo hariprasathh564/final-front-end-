@@ -846,7 +846,7 @@ export default function Footer() {
                    
                    {/* The Image */}
                    <img 
-                     src="https://varied-blush-qfjhsxatkx-7ugnp06lur.edgeone.dev/Gemini_Generated_Image_r7mwrdr7mwrdr7mw-removebg-preview.png"
+                     src="https://strong-red-gchc8xslep-jnk94srf9d.edgeone.dev/Gemini_Generated_Image_r7mwrdr7mwrdr7mw-removebg-preview.png"
                      alt="Milk Soda Logo"
                      className="relative z-10 w-full h-full object-contain animate-float drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] group-hover:scale-110 transition-transform duration-500"
                    />
