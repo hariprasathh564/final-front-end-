@@ -259,7 +259,7 @@ export default function Home() {
                            <img src={p.images?.[0]} alt="" className="w-10 h-10 rounded-lg object-cover" />
                            <div>
                               <p className="font-bold text-sm">{highlightText(p.name, searchQuery)}</p>
-                              <p className="text-xs text-purple-600">₹{p.price}</p>
+                              <p className="text-xs text-purple-600">LKR{p.price}</p>
                            </div>
                         </li>
                      ))}
@@ -295,7 +295,7 @@ export default function Home() {
                          <div className="absolute top-0 right-0 bg-black text-white text-xs font-bold px-4 py-2 rounded-bl-2xl z-10">{p.offer}</div>
                          <div className="h-64 rounded-[1.5rem] overflow-hidden bg-gray-50 relative mb-6">
                             <img src={p.images?.[0]} alt={p.name} className="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" />
-                            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-black shadow-sm">₹{p.price}</div>
+                            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-sm font-black shadow-sm">LKR{p.price}</div>
                          </div>
                          <h3 className="text-xl font-bold text-gray-900 mb-1">{p.name}</h3>
                          <p className="text-gray-500 text-sm line-clamp-2 mb-4">Premium ingredients, zero preservatives. The taste of 2025.</p>
@@ -389,7 +389,7 @@ export default function Home() {
                       <div>
                          <div className="flex justify-between items-start">
                             <h3 className="text-lg font-bold leading-tight">{highlightText(p.name, searchQuery)}</h3>
-                            <span className="text-lg font-bold">₹{p.price}</span>
+                            <span className="text-lg font-bold">LKR{p.price}</span>
                          </div>
                          <div className="flex gap-1 text-yellow-400 text-xs mt-1">
                             <FaStar /><FaStar /><FaStar /><FaStar /><FaStar className="text-gray-300" />

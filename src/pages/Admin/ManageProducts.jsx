@@ -679,7 +679,7 @@ export default function ManageProducts() {
                     <h4 className="text-xl font-bold text-white group-hover:text-cyan-300 transition">
                       {p.name}
                     </h4>
-                    <p className="text-cyan-400 font-mono font-bold mt-1 text-lg">₹ {p.price.toLocaleString()}</p>
+                    <p className="text-cyan-400 font-mono font-bold mt-1 text-lg">LKR {p.price.toLocaleString()}</p>
                     <p className="text-slate-400 text-sm mt-2 line-clamp-1 max-w-lg leading-relaxed">{p.description}</p>
                   </div>
                 </div>

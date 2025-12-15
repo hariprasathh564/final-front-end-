@@ -931,7 +931,7 @@ export default function Cart() {
                   ) : (
                     <>
                       <FaTruck className="text-indigo-400" />
-                      Add ₹{(freeShippingThreshold - reduxCart.total).toFixed(0)} for Free
+                      Add LKR{(freeShippingThreshold - reduxCart.total).toFixed(0)} for Free
                       Shipping
                     </>
                   )}
@@ -1083,7 +1083,7 @@ export default function Cart() {
                                       initial={{ scale: 1.2, opacity: 0 }}
                                       animate={{ scale: 1, opacity: 1 }}
                                     >
-                                      ₹{(item.price * item.quantity).toFixed(2)}
+                                      LKR{(item.price * item.quantity).toFixed(2)}
                                     </motion.p>
                                   </div>
 
@@ -1175,7 +1175,7 @@ export default function Cart() {
                       >
                         <span className="flex items-center gap-2">📦 Subtotal</span>
                         <span className="text-slate-900 font-black text-lg">
-                          ₹{reduxCart.total?.toFixed(2)}
+                          LKR{reduxCart.total?.toFixed(2)}
                         </span>
                       </motion.div>
 
@@ -1218,7 +1218,7 @@ export default function Cart() {
                           animate={{ scale: 1, color: "#FFFFFF" }}
                           transition={{ duration: 0.3 }}
                         >
-                          ₹{reduxCart.total?.toFixed(2)}
+                          LKR{reduxCart.total?.toFixed(2)}
                         </motion.span>
                       </motion.div>
                     </motion.div>

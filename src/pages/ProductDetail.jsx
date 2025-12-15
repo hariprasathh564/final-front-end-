@@ -823,7 +823,7 @@ export default function ProductDetail() {
                         <div>
                             <p className="text-xs font-bold uppercase text-slate-400 mb-1">Total Price</p>
                             <div className="text-4xl font-black text-slate-900 flex items-baseline">
-                                <span className="text-2xl mr-1">₹</span>{product.price * qty}
+                                <span className="text-2xl mr-1">LKR</span>{product.price * qty}
                             </div>
                         </div>
                         <div className="flex items-center bg-white rounded-full p-2 shadow-sm border border-slate-100">
@@ -915,7 +915,7 @@ export default function ProductDetail() {
                     isOpen={openAccordion === "shipping"} 
                     onClick={() => setOpenAccordion(openAccordion === "shipping" ? "" : "shipping")}
                 >
-                    <p>Free shipping on orders over ₹500. We accept returns within 30 days if the bottle is unopened.</p>
+                    <p>Free shipping on orders over LKR500. We accept returns within 30 days if the bottle is unopened.</p>
                 </AccordionItem>
             </div>
 
@@ -944,7 +944,7 @@ export default function ProductDetail() {
                             <div className="w-12 h-12 bg-slate-100 rounded-lg group-hover:scale-110 transition"></div>
                             <div>
                                 <p className="font-bold text-sm">Butter Cookies</p>
-                                <p className="text-xs text-indigo-500 font-bold">₹50</p>
+                                <p className="text-xs text-indigo-500 font-bold">LKR50</p>
                             </div>
                             <button className="ml-auto w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs shadow-lg"><FaPlus/></button>
                         </div>

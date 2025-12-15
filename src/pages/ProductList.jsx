@@ -1664,7 +1664,7 @@ export default function ProductList() {
                        {filteredProducts.slice(0, 5).map(p => (
                          <li key={p._id} onClick={() => handleSuggestionClick(p._id)} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition">
                            <span className="text-slate-700 font-bold">{highlightText(p.name, searchQuery)}</span>
-                           <span className="text-xs font-bold bg-slate-100 text-slate-900 px-2 py-1 rounded">₹{p.price}</span>
+                           <span className="text-xs font-bold bg-slate-100 text-slate-900 px-2 py-1 rounded">LKR{p.price}</span>
                          </li>
                        ))}
                     </motion.ul>
@@ -1756,7 +1756,7 @@ export default function ProductList() {
                     <div className="px-4 pt-6 pb-2 flex flex-col flex-grow">
                         <div className="flex justify-between items-start mb-2">
                            <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-violet-600 transition-colors line-clamp-2">{product.name}</h3>
-                           <span className="text-lg font-black text-violet-600 whitespace-nowrap ml-2">₹{product.price}</span>
+                           <span className="text-lg font-black text-violet-600 whitespace-nowrap ml-2">LKR{product.price}</span>
                         </div>
                         
                         <div className="flex items-center gap-1 mb-6 text-xs font-bold text-slate-400">
