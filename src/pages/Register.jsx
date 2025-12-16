@@ -309,15 +309,28 @@ export default function Register() {
     }
   };
 
+  // const getLiquidPosition = () => {
+  //   switch (focusState) {
+  //     case "name": return 0;
+  //     case "email": return 76;
+  //     case "phone": return 152;
+  //     case "password": return 228;
+  //     default: return 0;
+  //   }
+  // };
+
+
+  // Calculate Liquid Background Position based on 4 inputs
   const getLiquidPosition = () => {
-    switch (focusState) {
-      case "name": return 0;
-      case "email": return 76;
-      case "phone": return 152;
-      case "password": return 228;
-      default: return 0;
+    switch(focusState) {
+        case 'name': return 0;
+        case 'email': return 76;
+        case 'phone': return 152;
+        case 'password': return 228;
+        default: return 0;
     }
   };
+
 
   return (
     <div 
