@@ -180,626 +180,11 @@
 
 
 
-// import React, { useState, useEffect } from "react";
-// import { useAuth } from "../context/AuthContext";
-// import { useNavigate, Link } from "react-router-dom";
-// import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useAnimation } from "framer-motion";
-// import { AlertCircle, Loader2, Check, Eye, EyeOff, Sparkles, User, Mail, Phone, KeyRound } from "lucide-react";
-
-// // --- CONFIGURATION ---
-// const SPRING_CONFIG = { stiffness: 400, damping: 30 };
-
-// export default function Register() {
-//   const { register } = useAuth();
-//   const navigate = useNavigate();
-//   const shakeControls = useAnimation();
-
-//   // --- STATE ---
-//   const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
-//   const [err, setErr] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isSuccess, setIsSuccess] = useState(false);
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [focusState, setFocusState] = useState("none"); // 'name', 'email', 'phone', 'password', 'none'
-
-//   // --- 3D TILT LOGIC ---
-//   const x = useMotionValue(0);
-//   const y = useMotionValue(0);
-//   const rotateX = useTransform(useSpring(y, SPRING_CONFIG), [-0.5, 0.5], ["10deg", "-10deg"]);
-//   const rotateY = useTransform(useSpring(x, SPRING_CONFIG), [-0.5, 0.5], ["-10deg", "10deg"]);
-
-//   const handleMouseMove = (e) => {
-//     const rect = e.currentTarget.getBoundingClientRect();
-//     x.set((e.clientX - rect.left) / rect.width - 0.5);
-//     y.set((e.clientY - rect.top) / rect.height - 0.5);
-//   };
-
-//   // --- SUBMIT HANDLER ---
-//   const submit = async (e) => {
-//     e.preventDefault();
-//     setErr("");
-    
-//     // Validation
-//     if(!formData.name || !formData.email || !formData.phone || !formData.password) {
-//       setErr("Please fill all the cups!");
-//       shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
-//       return;
-//     }
-
-
-
-//     setIsLoading(true);
-    
-//     // Simulate Network Delay for Animation
-//     await new Promise(r => setTimeout(r, 1500)); 
-
-//     try {
-//       await register(formData);
-//       setIsLoading(false);
-//       setIsSuccess(true);
-//       setTimeout(() => navigate("/"), 1200); // Wait for confetti
-//     } catch (error) {
-//       setIsLoading(false);
-//       setErr(error.response?.data?.message || "Registration failed. Try again!");
-//       shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
-//     }
-//   };
-
-//   const handleChange = (field, value) => {
-//     setFormData(prev => ({ ...prev, [field]: value }));
-//   };
-
-//   // Calculate Liquid Background Position based on 4 inputs
-//   const getLiquidPosition = () => {
-//     switch(focusState) {
-//         case 'name': return 0;
-//         case 'email': return 76;
-//         case 'phone': return 152;
-//         case 'password': return 228;
-//         default: return 0;
-//     }
-//   };
-
-//   return (
-//     <div 
-//       className="relative min-h-screen w-full overflow-hidden bg-slate-100 flex items-center justify-center font-sans perspective-2000 py-10"
-//       onMouseMove={handleMouseMove}
-//     >
-//       {/* --- BACKGROUND --- */}
-//       <div className="absolute inset-0 -z-10 overflow-hidden">
-//         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
-//         <motion.div animate={{ x: [0, 50, 0], y: [0, -50, 0] }} transition={{ duration: 15, repeat: Infinity }} className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-60 mix-blend-multiply" />
-//         <motion.div animate={{ x: [0, -50, 0], y: [0, 50, 0] }} transition={{ duration: 20, repeat: Infinity }} className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-60 mix-blend-multiply" />
-//       </div>
-
-//       {/* --- CONFETTI (On Success) --- */}
-//       <AnimatePresence>
-//         {isSuccess && <Confetti />}
-//       </AnimatePresence>
-
-//       {/* --- CARD CONTAINER --- */}
-//       <motion.div
-//         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-//         initial={{ y: -100, opacity: 0 }}
-//         animate={{ y: 0, opacity: 1 }}
-//         transition={{ type: "spring", damping: 15 }}
-//         className="relative z-20 w-full max-w-[420px] px-4"
-//       >
-//         {/* MASCOT CHARACTER */}
-//         <Mascot 
-//           focusState={focusState} 
-//           // Track name length for eye movement
-//           textLength={formData.name.length} 
-//           showPassword={showPassword}
-//         />
-
-//         {/* MAIN CARD */}
-//         <motion.div 
-//           animate={shakeControls}
-//           className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white p-8"
-//         >
-//           {/* Header */}
-//           <div className="text-center mb-6 mt-4">
-//             <h2 className="text-3xl font-black text-slate-800 tracking-tighter">
-//               Join <span className="text-blue-500">MilkSoda</span>
-//             </h2>
-//             <p className="text-xs font-bold text-gray-400 mt-1 tracking-wide uppercase">Create your account</p>
-//           </div>
-
-//           {/* Error Message */}
-//           <AnimatePresence mode="wait">
-//             {err && (
-//               <motion.div
-//                 initial={{ height: 0, opacity: 0 }}
-//                 animate={{ height: "auto", opacity: 1 }}
-//                 exit={{ height: 0, opacity: 0 }}
-//                 className="mb-4 overflow-hidden"
-//               >
-//                 <div className="bg-red-50 text-red-500 px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2">
-//                   <AlertCircle size={16} /> {err}
-//                 </div>
-//               </motion.div>
-//             )}
-//           </AnimatePresence>
-
-//           <form onSubmit={submit} className="space-y-4 relative">
-            
-//             {/* Liquid Background for Inputs (Dynamic Height Calculation) */}
-//             <motion.div 
-//               className="absolute bg-blue-100 rounded-2xl -z-10 pointer-events-none"
-//               initial={false}
-//               animate={{
-//                 top: getLiquidPosition(),
-//                 height: 64,
-//                 width: "100%",
-//                 opacity: focusState === 'none' ? 0 : 1,
-//                 scale: focusState === 'none' ? 0.95 : 1.05,
-//               }}
-//               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-//             />
-
-//             {/* 1. Name */}
-//             <BouncyInput 
-//               icon={User}
-//               type="text"
-//               value={formData.name}
-//               onChange={(e) => handleChange('name', e.target.value)}
-//               placeholder="Full Name"
-//               isFocused={focusState === 'name'}
-//               onFocus={() => setFocusState('name')}
-//               onBlur={() => setFocusState('none')}
-//             />
-
-//             {/* 2. Email */}
-//             <BouncyInput 
-//               icon={Mail}
-//               type="email"
-//               value={formData.email}
-//               onChange={(e) => handleChange('email', e.target.value)}
-//               placeholder="Email Address"
-//               isFocused={focusState === 'email'}
-//               onFocus={() => setFocusState('email')}
-//               onBlur={() => setFocusState('none')}
-//             />
-
-//             {/* 3. Phone */}
-//             <BouncyInput 
-//               icon={Phone}
-//               type="tel"
-//               value={formData.phone}
-//               onChange={(e) => handleChange('phone', e.target.value)}
-//               placeholder="Phone Number"
-//               isFocused={focusState === 'phone'}
-//               onFocus={() => setFocusState('phone')}
-//               onBlur={() => setFocusState('none')}
-//             />
-
-//             {/* 4. Password */}
-//             <BouncyInput 
-//               icon={KeyRound}
-//               type={showPassword ? "text" : "password"}
-//               value={formData.password}
-//               onChange={(e) => handleChange('password', e.target.value)}
-//               placeholder="Password"
-//               isFocused={focusState === 'password'}
-//               onFocus={() => setFocusState('password')}
-//               onBlur={() => setFocusState('none')}
-//               rightElement={
-//                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-gray-400 hover:text-blue-500">
-//                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-//                 </button>
-//               }
-//             />
-
-//             {/* Spacer */}
-//             <div className="h-2"></div>
-
-//             {/* Submit Button */}
-//             <motion.button
-//               whileHover={{ scale: 1.03 }}
-//               whileTap={{ scale: 0.95 }}
-//               disabled={isLoading || isSuccess}
-//               className={`
-//                 relative w-full h-14 rounded-2xl font-black text-white text-lg overflow-hidden shadow-lg group
-//                 ${isSuccess ? "bg-green-500" : "bg-gradient-to-r from-blue-600 to-cyan-500"} transition-colors duration-500
-//               `}
-//             >
-//               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-//               <div className="flex items-center justify-center gap-2">
-//                 {isLoading ? (
-//                   <Loader2 className="animate-spin" />
-//                 ) : isSuccess ? (
-//                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1.5 }}><Check /></motion.div>
-//                 ) : (
-//                   <>Register <Sparkles size={18} /></>
-//                 )}
-//               </div>
-//             </motion.button>
-//           </form>
-
-//           <div className="mt-6 text-center text-xs font-bold text-gray-400">
-//             Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
-//           </div>
-//         </motion.div>
-//       </motion.div>
-      
-//       <style>{`@keyframes shimmer { 100% { transform: translateX(100%); } }`}</style>
-//     </div>
-//   );
-// }
-
-// // --- SUB-COMPONENTS ---
-
-// const BouncyInput = ({ icon: Icon, type, value, onChange, placeholder, isFocused, onFocus, onBlur, rightElement }) => {
-//   return (
-//     <motion.div animate={isFocused ? { scale: 1.02 } : { scale: 1 }} className="relative">
-//       <div className={`
-//         relative h-16 bg-white rounded-2xl border-2 flex items-center px-4 transition-all duration-300
-//         ${isFocused ? "border-blue-400 shadow-lg shadow-blue-200/50" : "border-transparent shadow-sm"}
-//       `}>
-//         <div className={`mr-3 transition-colors ${isFocused ? "text-blue-500" : "text-gray-300"}`}>
-//           <Icon size={22} />
-//         </div>
-//         <input
-//           type={type}
-//           value={value}
-//           onChange={onChange}
-//           onFocus={onFocus}
-//           onBlur={onBlur}
-//           placeholder={placeholder}
-//           className="w-full bg-transparent outline-none font-bold text-gray-700 placeholder-gray-300 h-full text-sm"
-//         />
-//         {rightElement && <div className="ml-2">{rightElement}</div>}
-//       </div>
-//     </motion.div>
-//   );
-// };
-
-// const Mascot = ({ focusState, textLength, showPassword }) => {
-//   const lookX = useSpring(0);
-//   const lookY = useSpring(0);
-
-//   useEffect(() => {
-//     // Mascot looks around based on which field is active
-//     if (focusState === 'name' || focusState === 'email') {
-//         // Track typing for top fields
-//         lookX.set(Math.min(textLength, 25) - 10); 
-//         lookY.set(5);
-//     } else if (focusState === 'phone') {
-//         // Look down for phone
-//         lookX.set(0);
-//         lookY.set(12);
-//     } else if (focusState === 'password') {
-//         // Scared / Hiding
-//         lookX.set(0);
-//         lookY.set(-5); 
-//     } else {
-//         // Neutral
-//         lookX.set(0);
-//         lookY.set(0);
-//     }
-//   }, [focusState, textLength, lookX, lookY]);
-
-//   const isHiding = focusState === 'password' && !showPassword;
-
-//   return (
-//     <div className="absolute -top-20 left-0 w-full flex justify-center pointer-events-none z-30">
-//       <div className="relative w-32 h-32">
-//         <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-xl">
-//           <motion.path 
-//             d="M100 30 C 100 30, 30 120, 30 140 C 30 180, 60 195, 100 195 C 140 195, 170 180, 170 140 C 170 120, 100 30, 100 30 Z" 
-//             fill="white"
-//             animate={{ d: ["M100 30 C 100 30, 30 120, 30 140 C 30 180, 60 195, 100 195 C 140 195, 170 180, 170 140 C 170 120, 100 30, 100 30 Z", "M100 35 C 100 35, 35 125, 35 142 C 35 182, 63 198, 100 198 C 137 198, 165 182, 165 142 C 165 125, 100 35, 100 35 Z"] }}
-//             transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }} 
-//           />
-//         </svg>
-//         <div className="absolute inset-0 flex flex-col items-center justify-center pt-10">
-//           <motion.div className="flex gap-4" style={{ x: lookX, y: lookY }}>
-//             <div className="w-4 h-6 bg-slate-800 rounded-full"><div className="w-1.5 h-1.5 bg-white rounded-full mt-1 ml-1" /></div>
-//             <div className="w-4 h-6 bg-slate-800 rounded-full"><div className="w-1.5 h-1.5 bg-white rounded-full mt-1 ml-1" /></div>
-//           </motion.div>
-//           <motion.div className="w-2 h-1 bg-pink-300 rounded-full mt-2" animate={{ scale: focusState !== 'none' ? 1.5 : 1 }} />
-//         </div>
-//         <motion.div
-//           className="absolute top-16 left-6 w-8 h-8 bg-white rounded-full border shadow-md"
-//           animate={isHiding ? { y: 0, x: 15, rotate: 0 } : { y: 40, x: -10, rotate: -20 }}
-//         />
-//         <motion.div
-//           className="absolute top-16 right-6 w-8 h-8 bg-white rounded-full border shadow-md"
-//           animate={isHiding ? { y: 0, x: -15, rotate: 0 } : { y: 40, x: 10, rotate: 20 }}
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Confetti = () => (
-//   <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
-//     {[...Array(30)].map((_, i) => (
-//       <motion.div
-//         key={i}
-//         className="absolute w-3 h-3 rounded-full"
-//         style={{ backgroundColor: ['#60A5FA', '#F472B6', '#34D399', '#FBBF24'][i % 4] }}
-//         initial={{ x: 0, y: 0, scale: 1 }}
-//         animate={{ x: (Math.random() - 0.5) * 800, y: (Math.random() - 0.5) * 800, opacity: 0, scale: 0 }}
-//         transition={{ duration: 1.5, ease: "easeOut" }}
-//       />
-//     ))}
-//   </div>
-// );
-
-
-
-
-
-// import React, { useState, useEffect } from "react";
-// import { useAuth } from "../context/AuthContext";
-// import { useNavigate, Link } from "react-router-dom";
-// import {
-//   motion,
-//   AnimatePresence,
-//   useMotionValue,
-//   useSpring,
-//   useTransform,
-//   useAnimation
-// } from "framer-motion";
-// import {
-//   AlertCircle,
-//   Loader2,
-//   Check,
-//   Eye,
-//   EyeOff,
-//   Sparkles,
-//   User,
-//   Mail,
-//   Phone,
-//   KeyRound
-// } from "lucide-react";
-
-// const SPRING_CONFIG = { stiffness: 400, damping: 30 };
-
-// export default function Register() {
-//   const { register } = useAuth();
-//   const navigate = useNavigate();
-//   const shakeControls = useAnimation();
-
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     phone: "",
-//     password: ""
-//   });
-
-//   const [fieldErrors, setFieldErrors] = useState({});
-//   const [err, setErr] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isSuccess, setIsSuccess] = useState(false);
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [focusState, setFocusState] = useState("none");
-
-//   const x = useMotionValue(0);
-//   const y = useMotionValue(0);
-//   const rotateX = useTransform(useSpring(y, SPRING_CONFIG), [-0.5, 0.5], ["10deg", "-10deg"]);
-//   const rotateY = useTransform(useSpring(x, SPRING_CONFIG), [-0.5, 0.5], ["-10deg", "10deg"]);
-
-//   const handleChange = (field, value) => {
-//     setFormData(prev => ({ ...prev, [field]: value }));
-//     setFieldErrors(prev => ({ ...prev, [field]: "" }));
-//   };
-
-//   const submit = async (e) => {
-//     e.preventDefault();
-//     setErr("");
-//     setFieldErrors({});
-
-//     const errors = {};
-//     if (!formData.name.trim()) errors.name = "Name is required";
-//     if (!formData.email.trim()) errors.email = "Email is required";
-//     if (!formData.phone.trim()) errors.phone = "Phone number is required";
-//     if (!formData.password.trim()) errors.password = "Password is required";
-
-//     if (Object.keys(errors).length > 0) {
-//       setFieldErrors(errors);
-//       shakeControls.start({
-//         x: [0, -15, 15, -15, 15, 0],
-//         transition: { duration: 0.4 }
-//       });
-//       return;
-//     }
-
-//     setIsLoading(true);
-//     await new Promise(r => setTimeout(r, 1200));
-
-//     try {
-//       await register(formData);
-//       setIsSuccess(true);
-//       setTimeout(() => navigate("/"), 1200);
-//     } catch (error) {
-//       setErr(error.response?.data?.message || "Registration failed");
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const getLiquidPosition = () => {
-//     switch (focusState) {
-//       case "name": return 0;
-//       case "email": return 76;
-//       case "phone": return 152;
-//       case "password": return 228;
-//       default: return 0;
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-slate-100">
-//       <motion.div
-//         style={{ rotateX, rotateY }}
-//         className="w-full max-w-[420px] px-4"
-//       >
-//         <motion.div
-//           animate={shakeControls}
-//           className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-8"
-//         >
-//           <h2 className="text-3xl font-black text-center mb-6">
-//             Join <span className="text-blue-500">MilkSoda</span>
-//           </h2>
-
-//           {/* GLOBAL ERROR */}
-//           <AnimatePresence>
-//             {err && (
-//               <motion.div className="mb-4 text-red-500 text-xs font-bold flex gap-2">
-//                 <AlertCircle size={14} /> {err}
-//               </motion.div>
-//             )}
-//           </AnimatePresence>
-
-//           <form onSubmit={submit} className="space-y-4 relative">
-
-//             <motion.div
-//               className="absolute bg-blue-100 rounded-2xl -z-10"
-//               animate={{
-//                 top: getLiquidPosition(),
-//                 height: 64,
-//                 width: "100%",
-//                 opacity: focusState === "none" ? 0 : 1
-//               }}
-//             />
-
-//             {/* NAME */}
-//             <BouncyInput
-//               icon={User}
-//               type="text"
-//               value={formData.name}
-//               onChange={e => handleChange("name", e.target.value)}
-//               placeholder="Full Name"
-//               isFocused={focusState === "name"}
-//               onFocus={() => setFocusState("name")}
-//               onBlur={() => setFocusState("none")}
-//             />
-//             {fieldErrors.name && (
-//               <p className="text-xs text-red-500 font-bold ml-3">
-//                 {fieldErrors.name}
-//               </p>
-//             )}
-
-//             {/* EMAIL */}
-//             <BouncyInput
-//               icon={Mail}
-//               type="email"
-//               value={formData.email}
-//               onChange={e => handleChange("email", e.target.value)}
-//               placeholder="Email Address"
-//               isFocused={focusState === "email"}
-//               onFocus={() => setFocusState("email")}
-//               onBlur={() => setFocusState("none")}
-//             />
-//             {fieldErrors.email && (
-//               <p className="text-xs text-red-500 font-bold ml-3">
-//                 {fieldErrors.email}
-//               </p>
-//             )}
-
-//             {/* PHONE */}
-//             <BouncyInput
-//               icon={Phone}
-//               type="tel"
-//               value={formData.phone}
-//               onChange={e => handleChange("phone", e.target.value)}
-//               placeholder="Phone Number"
-//               isFocused={focusState === "phone"}
-//               onFocus={() => setFocusState("phone")}
-//               onBlur={() => setFocusState("none")}
-//             />
-//             {fieldErrors.phone && (
-//               <p className="text-xs text-red-500 font-bold ml-3">
-//                 {fieldErrors.phone}
-//               </p>
-//             )}
-
-//             {/* PASSWORD */}
-//             <BouncyInput
-//               icon={KeyRound}
-//               type={showPassword ? "text" : "password"}
-//               value={formData.password}
-//               onChange={e => handleChange("password", e.target.value)}
-//               placeholder="Password"
-//               isFocused={focusState === "password"}
-//               onFocus={() => setFocusState("password")}
-//               onBlur={() => setFocusState("none")}
-//               rightElement={
-//                 <button type="button" onClick={() => setShowPassword(!showPassword)}>
-//                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-//                 </button>
-//               }
-//             />
-//             {fieldErrors.password && (
-//               <p className="text-xs text-red-500 font-bold ml-3">
-//                 {fieldErrors.password}
-//               </p>
-//             )}
-
-//             <motion.button
-//               whileHover={{ scale: 1.03 }}
-//               whileTap={{ scale: 0.95 }}
-//               disabled={isLoading}
-//               className="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black"
-//             >
-//               {isLoading ? <Loader2 className="animate-spin mx-auto" /> : "Register"}
-//             </motion.button>
-//           </form>
-
-//           <p className="text-xs text-center mt-6 font-bold text-gray-400">
-//             Already have an account?{" "}
-//             <Link to="/login" className="text-blue-500">Login</Link>
-//           </p>
-//         </motion.div>
-//       </motion.div>
-//     </div>
-//   );
-// }
-
-// // INPUT (UNCHANGED)
-// const BouncyInput = ({
-//   icon: Icon,
-//   isFocused,
-//   rightElement,
-//   ...props
-// }) => (
-//   <motion.div animate={isFocused ? { scale: 1.02 } : { scale: 1 }}>
-//     <div className={`h-16 bg-white rounded-2xl flex items-center px-4 border-2 ${isFocused ? "border-blue-400" : "border-transparent"}`}>
-//       <Icon size={22} className="mr-3 text-gray-400" />
-//       <input {...props} className="w-full outline-none font-bold text-sm" />
-//       {rightElement}
-//     </div>
-//   </motion.div>
-// );
-
-
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useAnimation
-} from "framer-motion";
-import {
-  AlertCircle,
-  Loader2,
-  Check,
-  Eye,
-  EyeOff,
-  Sparkles,
-  User,
-  Mail,
-  Phone,
-  KeyRound
-} from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useAnimation } from "framer-motion";
+import { AlertCircle, Loader2, Check, Eye, EyeOff, Sparkles, User, Mail, Phone, KeyRound } from "lucide-react";
 
 // --- CONFIGURATION ---
 const SPRING_CONFIG = { stiffness: 400, damping: 30 };
@@ -810,39 +195,75 @@ export default function Register() {
   const shakeControls = useAnimation();
 
   // --- STATE ---
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: ""
-  });
-
-  const [fieldErrors, setFieldErrors] = useState({});
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
   const [err, setErr] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [focusState, setFocusState] = useState("none");
+  const [focusState, setFocusState] = useState("none"); // 'name', 'email', 'phone', 'password', 'none'
 
-  // --- 3D TILT ---
+  // --- 3D TILT LOGIC ---
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useTransform(
-    useSpring(y, SPRING_CONFIG),
-    [-0.5, 0.5],
-    ["10deg", "-10deg"]
-  );
-  const rotateY = useTransform(
-    useSpring(x, SPRING_CONFIG),
-    [-0.5, 0.5],
-    ["-10deg", "10deg"]
-  );
+  const rotateX = useTransform(useSpring(y, SPRING_CONFIG), [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(useSpring(x, SPRING_CONFIG), [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     x.set((e.clientX - rect.left) / rect.width - 0.5);
     y.set((e.clientY - rect.top) / rect.height - 0.5);
   };
+
+  // // --- SUBMIT HANDLER ---
+  // const submit = async (e) => {
+  //   e.preventDefault();
+  //   setErr("");
+    
+  //   // Validation
+  //   if(!formData.name || !formData.email || !formData.phone || !formData.password) {
+  //     setErr("Please fill all the cups!");
+  //     shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
+  //     return;
+  //   }
+
+
+
+  //   setIsLoading(true);
+    
+  //   // Simulate Network Delay for Animation
+  //   await new Promise(r => setTimeout(r, 1500)); 
+
+  //   try {
+  //     await register(formData);
+  //     setIsLoading(false);
+  //     setIsSuccess(true);
+  //     setTimeout(() => navigate("/"), 1200); // Wait for confetti
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     setErr(error.response?.data?.message || "Registration failed. Try again!");
+  //     shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
+  //   }
+  // };
+
+  // const handleChange = (field, value) => {
+  //   setFormData(prev => ({ ...prev, [field]: value }));
+  // };
+
+  // // Calculate Liquid Background Position based on 4 inputs
+  // const getLiquidPosition = () => {
+  //   switch(focusState) {
+  //       case 'name': return 0;
+  //       case 'email': return 76;
+  //       case 'phone': return 152;
+  //       case 'password': return 228;
+  //       default: return 0;
+  //   }
+  // };
+
+
+
+
+
 
   // --- FORM HANDLERS ---
   const handleChange = (field, value) => {
@@ -899,35 +320,23 @@ export default function Register() {
   };
 
   return (
-    <div
-      className="relative min-h-screen w-full overflow-hidden bg-slate-100 flex items-center justify-center perspective-2000 py-10"
+    <div 
+      className="relative min-h-screen w-full overflow-hidden bg-slate-100 flex items-center justify-center font-sans perspective-2000 py-10"
       onMouseMove={handleMouseMove}
     >
       {/* --- BACKGROUND --- */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)",
-            backgroundSize: "30px 30px"
-          }}
-        />
-        <motion.div
-          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
-          className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-60"
-        />
-        <motion.div
-          animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
-          transition={{ duration: 20, repeat: Infinity }}
-          className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-60"
-        />
+        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+        <motion.div animate={{ x: [0, 50, 0], y: [0, -50, 0] }} transition={{ duration: 15, repeat: Infinity }} className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-60 mix-blend-multiply" />
+        <motion.div animate={{ x: [0, -50, 0], y: [0, 50, 0] }} transition={{ duration: 20, repeat: Infinity }} className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-60 mix-blend-multiply" />
       </div>
 
-      {/* --- CONFETTI --- */}
-      <AnimatePresence>{isSuccess && <Confetti />}</AnimatePresence>
+      {/* --- CONFETTI (On Success) --- */}
+      <AnimatePresence>
+        {isSuccess && <Confetti />}
+      </AnimatePresence>
 
-      {/* --- CARD --- */}
+      {/* --- CARD CONTAINER --- */}
       <motion.div
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
         initial={{ y: -100, opacity: 0 }}
@@ -935,202 +344,228 @@ export default function Register() {
         transition={{ type: "spring", damping: 15 }}
         className="relative z-20 w-full max-w-[420px] px-4"
       >
-        <Mascot
-          focusState={focusState}
-          textLength={formData.name.length}
+        {/* MASCOT CHARACTER */}
+        <Mascot 
+          focusState={focusState} 
+          // Track name length for eye movement
+          textLength={formData.name.length} 
           showPassword={showPassword}
         />
 
-        <motion.div
+        {/* MAIN CARD */}
+        <motion.div 
           animate={shakeControls}
           className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white p-8"
         >
+          {/* Header */}
           <div className="text-center mb-6 mt-4">
-            <h2 className="text-3xl font-black">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tighter">
               Join <span className="text-blue-500">MilkSoda</span>
             </h2>
-            <p className="text-xs font-bold text-gray-400 uppercase">
-              Create your account
-            </p>
+            <p className="text-xs font-bold text-gray-400 mt-1 tracking-wide uppercase">Create your account</p>
           </div>
 
-          {/* GLOBAL ERROR */}
-          <AnimatePresence>
+          {/* Error Message */}
+          <AnimatePresence mode="wait">
             {err && (
-              <motion.div className="mb-4 bg-red-50 text-red-500 px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2">
-                <AlertCircle size={16} /> {err}
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="mb-4 overflow-hidden"
+              >
+                <div className="bg-red-50 text-red-500 px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2">
+                  <AlertCircle size={16} /> {err}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          <form onSubmit={submit} className="space-y-3 relative">
-
-            {/* Liquid Highlight */}
-            <motion.div
-              className="absolute bg-blue-100 rounded-2xl -z-10"
+          <form onSubmit={submit} className="space-y-4 relative">
+            
+            {/* Liquid Background for Inputs (Dynamic Height Calculation) */}
+            <motion.div 
+              className="absolute bg-blue-100 rounded-2xl -z-10 pointer-events-none"
+              initial={false}
               animate={{
                 top: getLiquidPosition(),
                 height: 64,
                 width: "100%",
-                opacity: focusState === "none" ? 0 : 1
+                opacity: focusState === 'none' ? 0 : 1,
+                scale: focusState === 'none' ? 0.95 : 1.05,
               }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
             />
 
-            {/* NAME */}
-            <BouncyInput
+            {/* 1. Name */}
+            <BouncyInput 
               icon={User}
               type="text"
               value={formData.name}
-              onChange={e => handleChange("name", e.target.value)}
+              onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Full Name"
-              isFocused={focusState === "name"}
-              onFocus={() => setFocusState("name")}
-              onBlur={() => setFocusState("none")}
+              isFocused={focusState === 'name'}
+              onFocus={() => setFocusState('name')}
+              onBlur={() => setFocusState('none')}
             />
-            {fieldErrors.name && <FieldError text={fieldErrors.name} />}
 
-            {/* EMAIL */}
-            <BouncyInput
+            {/* 2. Email */}
+            <BouncyInput 
               icon={Mail}
               type="email"
               value={formData.email}
-              onChange={e => handleChange("email", e.target.value)}
+              onChange={(e) => handleChange('email', e.target.value)}
               placeholder="Email Address"
-              isFocused={focusState === "email"}
-              onFocus={() => setFocusState("email")}
-              onBlur={() => setFocusState("none")}
+              isFocused={focusState === 'email'}
+              onFocus={() => setFocusState('email')}
+              onBlur={() => setFocusState('none')}
             />
-            {fieldErrors.email && <FieldError text={fieldErrors.email} />}
 
-            {/* PHONE */}
-            <BouncyInput
+            {/* 3. Phone */}
+            <BouncyInput 
               icon={Phone}
               type="tel"
               value={formData.phone}
-              onChange={e => handleChange("phone", e.target.value)}
+              onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="Phone Number"
-              isFocused={focusState === "phone"}
-              onFocus={() => setFocusState("phone")}
-              onBlur={() => setFocusState("none")}
+              isFocused={focusState === 'phone'}
+              onFocus={() => setFocusState('phone')}
+              onBlur={() => setFocusState('none')}
             />
-            {fieldErrors.phone && <FieldError text={fieldErrors.phone} />}
 
-            {/* PASSWORD */}
-            <BouncyInput
+            {/* 4. Password */}
+            <BouncyInput 
               icon={KeyRound}
               type={showPassword ? "text" : "password"}
               value={formData.password}
-              onChange={e => handleChange("password", e.target.value)}
+              onChange={(e) => handleChange('password', e.target.value)}
               placeholder="Password"
-              isFocused={focusState === "password"}
-              onFocus={() => setFocusState("password")}
-              onBlur={() => setFocusState("none")}
+              isFocused={focusState === 'password'}
+              onFocus={() => setFocusState('password')}
+              onBlur={() => setFocusState('none')}
               rightElement={
-                <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-gray-400 hover:text-blue-500">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               }
             />
-            {fieldErrors.password && <FieldError text={fieldErrors.password} />}
 
+            {/* Spacer */}
+            <div className="h-2"></div>
+
+            {/* Submit Button */}
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.95 }}
               disabled={isLoading || isSuccess}
-              className={`w-full h-14 rounded-2xl font-black text-white ${
-                isSuccess
-                  ? "bg-green-500"
-                  : "bg-gradient-to-r from-blue-600 to-cyan-500"
-              }`}
+              className={`
+                relative w-full h-14 rounded-2xl font-black text-white text-lg overflow-hidden shadow-lg group
+                ${isSuccess ? "bg-green-500" : "bg-gradient-to-r from-blue-600 to-cyan-500"} transition-colors duration-500
+              `}
             >
-              {isLoading ? (
-                <Loader2 className="animate-spin mx-auto" />
-              ) : isSuccess ? (
-                <Check />
-              ) : (
-                <>Register <Sparkles size={18} /></>
-              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              <div className="flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : isSuccess ? (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1.5 }}><Check /></motion.div>
+                ) : (
+                  <>Register <Sparkles size={18} /></>
+                )}
+              </div>
             </motion.button>
           </form>
 
           <div className="mt-6 text-center text-xs font-bold text-gray-400">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-500">Login</Link>
+            Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
           </div>
         </motion.div>
       </motion.div>
+      
+      <style>{`@keyframes shimmer { 100% { transform: translateX(100%); } }`}</style>
     </div>
   );
 }
 
-/* ---------- SMALL HELPERS ---------- */
+// --- SUB-COMPONENTS ---
 
-const FieldError = ({ text }) => (
-  <p className="text-xs text-red-500 font-bold ml-3">
-    {text}
-  </p>
-);
-
-const BouncyInput = ({ icon: Icon, isFocused, rightElement, ...props }) => (
-  <motion.div animate={isFocused ? { scale: 1.02 } : { scale: 1 }}>
-    <div
-      className={`h-16 bg-white rounded-2xl flex items-center px-4 border-2 transition-all ${
-        isFocused ? "border-blue-400 shadow-lg" : "border-transparent"
-      }`}
-    >
-      <Icon size={22} className="mr-3 text-gray-400" />
-      <input {...props} className="w-full outline-none font-bold text-sm" />
-      {rightElement}
-    </div>
-  </motion.div>
-);
-
-/* ---------- MASCOT + CONFETTI (UNCHANGED) ---------- */
+const BouncyInput = ({ icon: Icon, type, value, onChange, placeholder, isFocused, onFocus, onBlur, rightElement }) => {
+  return (
+    <motion.div animate={isFocused ? { scale: 1.02 } : { scale: 1 }} className="relative">
+      <div className={`
+        relative h-16 bg-white rounded-2xl border-2 flex items-center px-4 transition-all duration-300
+        ${isFocused ? "border-blue-400 shadow-lg shadow-blue-200/50" : "border-transparent shadow-sm"}
+      `}>
+        <div className={`mr-3 transition-colors ${isFocused ? "text-blue-500" : "text-gray-300"}`}>
+          <Icon size={22} />
+        </div>
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          className="w-full bg-transparent outline-none font-bold text-gray-700 placeholder-gray-300 h-full text-sm"
+        />
+        {rightElement && <div className="ml-2">{rightElement}</div>}
+      </div>
+    </motion.div>
+  );
+};
 
 const Mascot = ({ focusState, textLength, showPassword }) => {
   const lookX = useSpring(0);
   const lookY = useSpring(0);
 
   useEffect(() => {
-    if (focusState === "name" || focusState === "email") {
-      lookX.set(Math.min(textLength, 25) - 10);
-      lookY.set(5);
-    } else if (focusState === "phone") {
-      lookY.set(12);
-    } else if (focusState === "password") {
-      lookY.set(-5);
+    // Mascot looks around based on which field is active
+    if (focusState === 'name' || focusState === 'email') {
+        // Track typing for top fields
+        lookX.set(Math.min(textLength, 25) - 10); 
+        lookY.set(5);
+    } else if (focusState === 'phone') {
+        // Look down for phone
+        lookX.set(0);
+        lookY.set(12);
+    } else if (focusState === 'password') {
+        // Scared / Hiding
+        lookX.set(0);
+        lookY.set(-5); 
     } else {
-      lookX.set(0);
-      lookY.set(0);
+        // Neutral
+        lookX.set(0);
+        lookY.set(0);
     }
   }, [focusState, textLength, lookX, lookY]);
 
-  const isHiding = focusState === "password" && !showPassword;
+  const isHiding = focusState === 'password' && !showPassword;
 
   return (
-    <div className="absolute -top-20 w-full flex justify-center pointer-events-none">
+    <div className="absolute -top-20 left-0 w-full flex justify-center pointer-events-none z-30">
       <div className="relative w-32 h-32">
-        <svg viewBox="0 0 200 200" className="w-full h-full">
-          <motion.path
-            d="M100 30 C 30 120, 30 180, 100 195 C 170 180, 170 120, 100 30 Z"
+        <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-xl">
+          <motion.path 
+            d="M100 30 C 100 30, 30 120, 30 140 C 30 180, 60 195, 100 195 C 140 195, 170 180, 170 140 C 170 120, 100 30, 100 30 Z" 
             fill="white"
-            animate={{ scale: [1, 1.03, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            animate={{ d: ["M100 30 C 100 30, 30 120, 30 140 C 30 180, 60 195, 100 195 C 140 195, 170 180, 170 140 C 170 120, 100 30, 100 30 Z", "M100 35 C 100 35, 35 125, 35 142 C 35 182, 63 198, 100 198 C 137 198, 165 182, 165 142 C 165 125, 100 35, 100 35 Z"] }}
+            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }} 
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center pt-10">
-          <motion.div style={{ x: lookX, y: lookY }} className="flex gap-4">
-            <div className="w-4 h-6 bg-black rounded-full" />
-            <div className="w-4 h-6 bg-black rounded-full" />
+          <motion.div className="flex gap-4" style={{ x: lookX, y: lookY }}>
+            <div className="w-4 h-6 bg-slate-800 rounded-full"><div className="w-1.5 h-1.5 bg-white rounded-full mt-1 ml-1" /></div>
+            <div className="w-4 h-6 bg-slate-800 rounded-full"><div className="w-1.5 h-1.5 bg-white rounded-full mt-1 ml-1" /></div>
           </motion.div>
+          <motion.div className="w-2 h-1 bg-pink-300 rounded-full mt-2" animate={{ scale: focusState !== 'none' ? 1.5 : 1 }} />
         </div>
         <motion.div
-          className="absolute top-16 left-6 w-8 h-8 bg-white rounded-full"
-          animate={isHiding ? { y: 0 } : { y: 40 }}
+          className="absolute top-16 left-6 w-8 h-8 bg-white rounded-full border shadow-md"
+          animate={isHiding ? { y: 0, x: 15, rotate: 0 } : { y: 40, x: -10, rotate: -20 }}
         />
         <motion.div
-          className="absolute top-16 right-6 w-8 h-8 bg-white rounded-full"
-          animate={isHiding ? { y: 0 } : { y: 40 }}
+          className="absolute top-16 right-6 w-8 h-8 bg-white rounded-full border shadow-md"
+          animate={isHiding ? { y: 0, x: -15, rotate: 0 } : { y: 40, x: 10, rotate: 20 }}
         />
       </div>
     </div>
@@ -1138,22 +573,403 @@ const Mascot = ({ focusState, textLength, showPassword }) => {
 };
 
 const Confetti = () => (
-  <div className="absolute inset-0 pointer-events-none">
+  <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
     {[...Array(30)].map((_, i) => (
       <motion.div
         key={i}
         className="absolute w-3 h-3 rounded-full"
-        style={{
-          backgroundColor: ["#60A5FA", "#F472B6", "#34D399", "#FBBF24"][i % 4]
-        }}
-        initial={{ x: 0, y: 0 }}
-        animate={{
-          x: (Math.random() - 0.5) * 800,
-          y: (Math.random() - 0.5) * 800,
-          opacity: 0
-        }}
-        transition={{ duration: 1.5 }}
+        style={{ backgroundColor: ['#60A5FA', '#F472B6', '#34D399', '#FBBF24'][i % 4] }}
+        initial={{ x: 0, y: 0, scale: 1 }}
+        animate={{ x: (Math.random() - 0.5) * 800, y: (Math.random() - 0.5) * 800, opacity: 0, scale: 0 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
       />
     ))}
   </div>
 );
+
+
+
+
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { useAuth } from "../context/AuthContext";
+// import { useNavigate, Link } from "react-router-dom";
+// import {
+//   motion,
+//   AnimatePresence,
+//   useMotionValue,
+//   useSpring,
+//   useTransform,
+//   useAnimation
+// } from "framer-motion";
+// import {
+//   AlertCircle,
+//   Loader2,
+//   Check,
+//   Eye,
+//   EyeOff,
+//   Sparkles,
+//   User,
+//   Mail,
+//   Phone,
+//   KeyRound
+// } from "lucide-react";
+
+// // --- CONFIGURATION ---
+// const SPRING_CONFIG = { stiffness: 400, damping: 30 };
+
+// export default function Register() {
+//   const { register } = useAuth();
+//   const navigate = useNavigate();
+//   const shakeControls = useAnimation();
+
+//   // --- STATE ---
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     password: ""
+//   });
+
+//   const [fieldErrors, setFieldErrors] = useState({});
+//   const [err, setErr] = useState("");
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [isSuccess, setIsSuccess] = useState(false);
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [focusState, setFocusState] = useState("none");
+
+//   // --- 3D TILT ---
+//   const x = useMotionValue(0);
+//   const y = useMotionValue(0);
+//   const rotateX = useTransform(
+//     useSpring(y, SPRING_CONFIG),
+//     [-0.5, 0.5],
+//     ["10deg", "-10deg"]
+//   );
+//   const rotateY = useTransform(
+//     useSpring(x, SPRING_CONFIG),
+//     [-0.5, 0.5],
+//     ["-10deg", "10deg"]
+//   );
+
+//   const handleMouseMove = (e) => {
+//     const rect = e.currentTarget.getBoundingClientRect();
+//     x.set((e.clientX - rect.left) / rect.width - 0.5);
+//     y.set((e.clientY - rect.top) / rect.height - 0.5);
+//   };
+
+//   // --- FORM HANDLERS ---
+//   const handleChange = (field, value) => {
+//     setFormData(prev => ({ ...prev, [field]: value }));
+//     setFieldErrors(prev => ({ ...prev, [field]: "" }));
+//   };
+
+//   const submit = async (e) => {
+//     e.preventDefault();
+//     setErr("");
+//     setFieldErrors({});
+
+//     const errors = {};
+//     if (!formData.name.trim()) errors.name = "Name is required";
+//     if (!formData.email.trim()) errors.email = "Email is required";
+//     if (!formData.phone.trim()) errors.phone = "Phone number is required";
+//     if (!formData.password.trim()) errors.password = "Password is required";
+
+//     if (Object.keys(errors).length > 0) {
+//       setFieldErrors(errors);
+//       shakeControls.start({
+//         x: [0, -15, 15, -15, 15, 0],
+//         transition: { duration: 0.4 }
+//       });
+//       return;
+//     }
+
+//     setIsLoading(true);
+//     await new Promise(r => setTimeout(r, 1500));
+
+//     try {
+//       await register(formData);
+//       setIsSuccess(true);
+//       setTimeout(() => navigate("/"), 1200);
+//     } catch (error) {
+//       setErr(error.response?.data?.message || "Registration failed");
+//       shakeControls.start({
+//         x: [0, -15, 15, -15, 15, 0],
+//         transition: { duration: 0.4 }
+//       });
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const getLiquidPosition = () => {
+//     switch (focusState) {
+//       case "name": return 0;
+//       case "email": return 76;
+//       case "phone": return 152;
+//       case "password": return 228;
+//       default: return 0;
+//     }
+//   };
+
+//   return (
+//     <div
+//       className="relative min-h-screen w-full overflow-hidden bg-slate-100 flex items-center justify-center perspective-2000 py-10"
+//       onMouseMove={handleMouseMove}
+//     >
+//       {/* --- BACKGROUND --- */}
+//       <div className="absolute inset-0 -z-10 overflow-hidden">
+//         <div
+//           className="absolute inset-0 opacity-30"
+//           style={{
+//             backgroundImage: "radial-gradient(#cbd5e1 1px, transparent 1px)",
+//             backgroundSize: "30px 30px"
+//           }}
+//         />
+//         <motion.div
+//           animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
+//           transition={{ duration: 15, repeat: Infinity }}
+//           className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-60"
+//         />
+//         <motion.div
+//           animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
+//           transition={{ duration: 20, repeat: Infinity }}
+//           className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-60"
+//         />
+//       </div>
+
+//       {/* --- CONFETTI --- */}
+//       <AnimatePresence>{isSuccess && <Confetti />}</AnimatePresence>
+
+//       {/* --- CARD --- */}
+//       <motion.div
+//         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+//         initial={{ y: -100, opacity: 0 }}
+//         animate={{ y: 0, opacity: 1 }}
+//         transition={{ type: "spring", damping: 15 }}
+//         className="relative z-20 w-full max-w-[420px] px-4"
+//       >
+//         <Mascot
+//           focusState={focusState}
+//           textLength={formData.name.length}
+//           showPassword={showPassword}
+//         />
+
+//         <motion.div
+//           animate={shakeControls}
+//           className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white p-8"
+//         >
+//           <div className="text-center mb-6 mt-4">
+//             <h2 className="text-3xl font-black">
+//               Join <span className="text-blue-500">MilkSoda</span>
+//             </h2>
+//             <p className="text-xs font-bold text-gray-400 uppercase">
+//               Create your account
+//             </p>
+//           </div>
+
+//           {/* GLOBAL ERROR */}
+//           <AnimatePresence>
+//             {err && (
+//               <motion.div className="mb-4 bg-red-50 text-red-500 px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2">
+//                 <AlertCircle size={16} /> {err}
+//               </motion.div>
+//             )}
+//           </AnimatePresence>
+
+//           <form onSubmit={submit} className="space-y-3 relative">
+
+//             {/* Liquid Highlight */}
+//             <motion.div
+//               className="absolute bg-blue-100 rounded-2xl -z-10"
+//               animate={{
+//                 top: getLiquidPosition(),
+//                 height: 64,
+//                 width: "100%",
+//                 opacity: focusState === "none" ? 0 : 1
+//               }}
+//             />
+
+//             {/* NAME */}
+//             <BouncyInput
+//               icon={User}
+//               type="text"
+//               value={formData.name}
+//               onChange={e => handleChange("name", e.target.value)}
+//               placeholder="Full Name"
+//               isFocused={focusState === "name"}
+//               onFocus={() => setFocusState("name")}
+//               onBlur={() => setFocusState("none")}
+//             />
+//             {fieldErrors.name && <FieldError text={fieldErrors.name} />}
+
+//             {/* EMAIL */}
+//             <BouncyInput
+//               icon={Mail}
+//               type="email"
+//               value={formData.email}
+//               onChange={e => handleChange("email", e.target.value)}
+//               placeholder="Email Address"
+//               isFocused={focusState === "email"}
+//               onFocus={() => setFocusState("email")}
+//               onBlur={() => setFocusState("none")}
+//             />
+//             {fieldErrors.email && <FieldError text={fieldErrors.email} />}
+
+//             {/* PHONE */}
+//             <BouncyInput
+//               icon={Phone}
+//               type="tel"
+//               value={formData.phone}
+//               onChange={e => handleChange("phone", e.target.value)}
+//               placeholder="Phone Number"
+//               isFocused={focusState === "phone"}
+//               onFocus={() => setFocusState("phone")}
+//               onBlur={() => setFocusState("none")}
+//             />
+//             {fieldErrors.phone && <FieldError text={fieldErrors.phone} />}
+
+//             {/* PASSWORD */}
+//             <BouncyInput
+//               icon={KeyRound}
+//               type={showPassword ? "text" : "password"}
+//               value={formData.password}
+//               onChange={e => handleChange("password", e.target.value)}
+//               placeholder="Password"
+//               isFocused={focusState === "password"}
+//               onFocus={() => setFocusState("password")}
+//               onBlur={() => setFocusState("none")}
+//               rightElement={
+//                 <button type="button" onClick={() => setShowPassword(!showPassword)}>
+//                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+//                 </button>
+//               }
+//             />
+//             {fieldErrors.password && <FieldError text={fieldErrors.password} />}
+
+//             <motion.button
+//               whileHover={{ scale: 1.03 }}
+//               whileTap={{ scale: 0.95 }}
+//               disabled={isLoading || isSuccess}
+//               className={`w-full h-14 rounded-2xl font-black text-white ${
+//                 isSuccess
+//                   ? "bg-green-500"
+//                   : "bg-gradient-to-r from-blue-600 to-cyan-500"
+//               }`}
+//             >
+//               {isLoading ? (
+//                 <Loader2 className="animate-spin mx-auto" />
+//               ) : isSuccess ? (
+//                 <Check />
+//               ) : (
+//                 <>Register <Sparkles size={18} /></>
+//               )}
+//             </motion.button>
+//           </form>
+
+//           <div className="mt-6 text-center text-xs font-bold text-gray-400">
+//             Already have an account?{" "}
+//             <Link to="/login" className="text-blue-500">Login</Link>
+//           </div>
+//         </motion.div>
+//       </motion.div>
+//     </div>
+//   );
+// }
+
+// /* ---------- SMALL HELPERS ---------- */
+
+// const FieldError = ({ text }) => (
+//   <p className="text-xs text-red-500 font-bold ml-3">
+//     {text}
+//   </p>
+// );
+
+// const BouncyInput = ({ icon: Icon, isFocused, rightElement, ...props }) => (
+//   <motion.div animate={isFocused ? { scale: 1.02 } : { scale: 1 }}>
+//     <div
+//       className={`h-16 bg-white rounded-2xl flex items-center px-4 border-2 transition-all ${
+//         isFocused ? "border-blue-400 shadow-lg" : "border-transparent"
+//       }`}
+//     >
+//       <Icon size={22} className="mr-3 text-gray-400" />
+//       <input {...props} className="w-full outline-none font-bold text-sm" />
+//       {rightElement}
+//     </div>
+//   </motion.div>
+// );
+
+// /* ---------- MASCOT + CONFETTI (UNCHANGED) ---------- */
+
+// const Mascot = ({ focusState, textLength, showPassword }) => {
+//   const lookX = useSpring(0);
+//   const lookY = useSpring(0);
+
+//   useEffect(() => {
+//     if (focusState === "name" || focusState === "email") {
+//       lookX.set(Math.min(textLength, 25) - 10);
+//       lookY.set(5);
+//     } else if (focusState === "phone") {
+//       lookY.set(12);
+//     } else if (focusState === "password") {
+//       lookY.set(-5);
+//     } else {
+//       lookX.set(0);
+//       lookY.set(0);
+//     }
+//   }, [focusState, textLength, lookX, lookY]);
+
+//   const isHiding = focusState === "password" && !showPassword;
+
+//   return (
+//     <div className="absolute -top-20 w-full flex justify-center pointer-events-none">
+//       <div className="relative w-32 h-32">
+//         <svg viewBox="0 0 200 200" className="w-full h-full">
+//           <motion.path
+//             d="M100 30 C 30 120, 30 180, 100 195 C 170 180, 170 120, 100 30 Z"
+//             fill="white"
+//             animate={{ scale: [1, 1.03, 1] }}
+//             transition={{ duration: 2, repeat: Infinity }}
+//           />
+//         </svg>
+//         <div className="absolute inset-0 flex flex-col items-center justify-center pt-10">
+//           <motion.div style={{ x: lookX, y: lookY }} className="flex gap-4">
+//             <div className="w-4 h-6 bg-black rounded-full" />
+//             <div className="w-4 h-6 bg-black rounded-full" />
+//           </motion.div>
+//         </div>
+//         <motion.div
+//           className="absolute top-16 left-6 w-8 h-8 bg-white rounded-full"
+//           animate={isHiding ? { y: 0 } : { y: 40 }}
+//         />
+//         <motion.div
+//           className="absolute top-16 right-6 w-8 h-8 bg-white rounded-full"
+//           animate={isHiding ? { y: 0 } : { y: 40 }}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// const Confetti = () => (
+//   <div className="absolute inset-0 pointer-events-none">
+//     {[...Array(30)].map((_, i) => (
+//       <motion.div
+//         key={i}
+//         className="absolute w-3 h-3 rounded-full"
+//         style={{
+//           backgroundColor: ["#60A5FA", "#F472B6", "#34D399", "#FBBF24"][i % 4]
+//         }}
+//         initial={{ x: 0, y: 0 }}
+//         animate={{
+//           x: (Math.random() - 0.5) * 800,
+//           y: (Math.random() - 0.5) * 800,
+//           opacity: 0
+//         }}
+//         transition={{ duration: 1.5 }}
+//       />
+//     ))}
+//   </div>
+// );
