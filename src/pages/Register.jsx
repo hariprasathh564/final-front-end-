@@ -226,6 +226,43 @@ export default function Register() {
       return;
     }
 
+if(!formData.name)
+       setErr("please fill the name");
+if(!formData.email)
+      setErr("please fill the email");
+ if(!formData.phone)
+ setErr("please fill the phone");
+if(!formData.password)
+     setErr("please fill the password");
+
+
+//  const submit = async (e) => {
+//     e.preventDefault();
+//     setErr("");
+//     if(!formData.name)
+//       setErr("please fill the name");}
+
+//      const submit1 = async (e) => {
+//     e.preventDefault();
+//     setErr("");
+//     if(!formData.email)
+//       setErr("please fill the email");
+
+//      const submit = async (e) => {
+//     e.preventDefault();
+//     setErr("");
+//     if(!formData.phone)
+//       setErr("please fill the phone");}
+
+//      const submit3 = async (e) => {
+//     e.preventDefault();
+//     setErr("");
+//     if(!formData.password)
+//       setErr("please fill the password");}
+
+//      shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
+//       return;
+//   }
     setIsLoading(true);
     
     // Simulate Network Delay for Animation
