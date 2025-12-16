@@ -214,108 +214,49 @@ export default function Register() {
     y.set((e.clientY - rect.top) / rect.height - 0.5);
   };
 
-  // // --- SUBMIT HANDLER ---
-  // const submit = async (e) => {
-  //   e.preventDefault();
-  //   setErr("");
-    
-  //   // Validation
-  //   if(!formData.name || !formData.email || !formData.phone || !formData.password) {
-  //     setErr("Please fill all the cups!");
-  //     shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
-  //     return;
-  //   }
-
-
-
-  //   setIsLoading(true);
-    
-  //   // Simulate Network Delay for Animation
-  //   await new Promise(r => setTimeout(r, 1500)); 
-
-  //   try {
-  //     await register(formData);
-  //     setIsLoading(false);
-  //     setIsSuccess(true);
-  //     setTimeout(() => navigate("/"), 1200); // Wait for confetti
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     setErr(error.response?.data?.message || "Registration failed. Try again!");
-  //     shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
-  //   }
-  // };
-
-  // const handleChange = (field, value) => {
-  //   setFormData(prev => ({ ...prev, [field]: value }));
-  // };
-
-  // // Calculate Liquid Background Position based on 4 inputs
-  // const getLiquidPosition = () => {
-  //   switch(focusState) {
-  //       case 'name': return 0;
-  //       case 'email': return 76;
-  //       case 'phone': return 152;
-  //       case 'password': return 228;
-  //       default: return 0;
-  //   }
-  // };
-
-
-
-
-
-
-  // --- FORM HANDLERS ---
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setFieldErrors(prev => ({ ...prev, [field]: "" }));
-  };
-
+  // --- SUBMIT HANDLER ---
   const submit = async (e) => {
     e.preventDefault();
     setErr("");
-    setFieldErrors({});
-
-    const errors = {};
-    if (!formData.name.trim()) errors.name = "Name is required";
-    if (!formData.email.trim()) errors.email = "Email is required";
-    if (!formData.phone.trim()) errors.phone = "Phone number is required";
-    if (!formData.password.trim()) errors.password = "Password is required";
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      shakeControls.start({
-        x: [0, -15, 15, -15, 15, 0],
-        transition: { duration: 0.4 }
-      });
+    
+    // Validation
+    if(!formData.name || !formData.email || !formData.phone || !formData.password) {
+      setErr("Please fill all the cups!");
+      shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
       return;
     }
 
+
+
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
+    
+    // Simulate Network Delay for Animation
+    await new Promise(r => setTimeout(r, 1500)); 
 
     try {
       await register(formData);
-      setIsSuccess(true);
-      setTimeout(() => navigate("/"), 1200);
-    } catch (error) {
-      setErr(error.response?.data?.message || "Registration failed");
-      shakeControls.start({
-        x: [0, -15, 15, -15, 15, 0],
-        transition: { duration: 0.4 }
-      });
-    } finally {
       setIsLoading(false);
+      setIsSuccess(true);
+      setTimeout(() => navigate("/"), 1200); // Wait for confetti
+    } catch (error) {
+      setIsLoading(false);
+      setErr(error.response?.data?.message || "Registration failed. Try again!");
+      shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
     }
   };
 
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Calculate Liquid Background Position based on 4 inputs
   const getLiquidPosition = () => {
-    switch (focusState) {
-      case "name": return 0;
-      case "email": return 76;
-      case "phone": return 152;
-      case "password": return 228;
-      default: return 0;
+    switch(focusState) {
+        case 'name': return 0;
+        case 'email': return 76;
+        case 'phone': return 152;
+        case 'password': return 228;
+        default: return 0;
     }
   };
 
