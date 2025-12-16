@@ -223,9 +223,7 @@ export default function Register() {
     if(!formData.name || !formData.email || !formData.phone || !formData.password) {
       setErr("Please fill all the cups!");
       shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
-      return;
-    }
-
+      
 if(!formData.name)
        setErr("please fill the name");
 if(!formData.email)
@@ -234,6 +232,9 @@ if(!formData.email)
  setErr("please fill the phone");
 if(!formData.password)
      setErr("please fill the password");
+ shakeControls.start({ x: [0, -15, 15, -15, 15, 0], transition: { duration: 0.4 } });
+      return;
+    }
 
 
 //  const submit = async (e) => {
